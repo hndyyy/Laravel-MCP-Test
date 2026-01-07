@@ -6,6 +6,7 @@ use Laravel\Mcp\Server; // <--- INI PERBAIKANNYA (File ada di src/Server.php)
 use App\Mcp\Tools\ReadFileTool;
 use App\Mcp\Tools\WriteFileTool;
 use App\Mcp\Tools\ListFilesTool;
+use App\Mcp\Tools\TriggerN8nTool;
 
 class FileSystemServer extends Server
 {
@@ -16,5 +17,6 @@ class FileSystemServer extends Server
         ReadFileTool::class,
         WriteFileTool::class,
         ListFilesTool::class,
+        TriggerN8nTool::class,
     ];
 }
