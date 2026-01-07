@@ -1,0 +1,27 @@
+# Perubahan yang Dilakukan
+
+## 1. Analisa Aset di Views
+- Menganalisa file layouts (app.blade.php dan guest.blade.php)
+- Ditemukan penggunaan Vite untuk asset bundling:
+  - resources/css/app-frontend.css
+  - resources/js/app-frontend.js
+- Kedua layout menggunakan @vite() directive untuk load assets
+
+## 2. File Middleware Content Security Policy
+- Dibuat file baru: `app/Http/Middleware/ContentSecurityPolicy.php`
+- Fitur yang diimplementasikan:
+  - CSP directives yang compatible dengan Vite
+  - Nonce generation untuk inline scripts/styles
+  - Mengizinkan 'unsafe-eval' untuk Vite HMR di development
+  - Mengizinkan 'unsafe-inline' untuk Vite injected styles
+  - WebSocket support (ws: wss:) untuk Vite HMR
+  - Security headers tambahan:
+    - X-Content-Type-Options: nosniff
+    - X-Frame-Options: SAMEORIGIN
+    - X-XSS-Protection: 1; mode=block
+    - Referrer-Policy: strict-origin-when-cross-origin
+
+## Catatan
+- Middleware ini siap digunakan dan perlu didaftarkan di `bootstrap/app.php` atau `app/Http/Kernel.php`
+- CSP policy disesuaikan dengan kebutuhan Vite asset bundling
+- Untuk production, pertimbangkan untuk menonaktifkan 'unsafe-eval' jika tidak diperlukan
