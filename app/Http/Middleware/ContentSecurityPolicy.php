@@ -3,20 +3,15 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 
 class ContentSecurityPolicy
 {
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
-        $nonce = base64_encode(random_bytes(16));
-        $request->attributes->set('csp_nonce', $nonce);
-
+        $policy = "default-src 'self'; script-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://www.google-analytics.com 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self'; connect-src 'self'; frame-src 'none'; object-src 'none'; media-src 'self'; base-uri 'self';";
         $response = $next($request);
-
-        $policy = "default-src 'self'; script-src 'self' 'nonce-{$nonce}' fonts.googleapis.com www.google.com www.googletagmanager.com dl.google.com; connect-src 'self'; img-src 'self' data:; font-src 'self' fonts.gstatic.com; style-src 'self' fonts.googleapis.com 'unsafe-inline'; frame-src 'none'; child-src 'none'; object-src 'none'; media-src 'self'; form-action 'self'; base-uri 'self'; plugin-types application/pdf application/x-shockwave-flash video/quicktime image/svg+xml; upgrade-insecure-requests;";
-
-        $response->headers->set('Content-Security-Policy', $policy);
-
+        $response->header('Content-Security-Policy', $policy);
         return $response;
     }
 }
