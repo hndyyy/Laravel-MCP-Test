@@ -9,10 +9,22 @@ class ContentSecurityPolicy
 {
     public function handle(Request $request, Closure $next)
     {
-        $policy = "default-src 'self'; script-src 'self' 'unsafe-inline' www.google-analytics.com; font-src 'self' fonts.gstatic.com gstatic.com; style-src 'self' 'unsafe-inline' https:; connect-src 'self'; img-src 'self' data:;";
+        $nonce = bin2hex(random_bytes(16));
+        $request->attributes->set('csp_nonce', $nonce);
 
-        $response = $next($request);
-        $response->header('Content-Security-Policy', $policy);
-        return $response;
+        $policy = "default-src 'self' 'strict-dynamic' https: http:; " .
+                  "script-src 'self' 'unsafe-inline' 'nonce-" . $nonce . "' https://fonts.googleapis.com; " .
+                  "connect-src 'self' http://127.0.0.1:8000 https://127.0.0.1:8000 https://127.0.0.1; " .
+                  "img-src 'self' data: https://fonts.gstatic.com; " .
+                  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " .
+                  "font-src 'self' https://fonts.gstatic.com; " .
+                  "form-action 'self'; " .
+                  "frame-ancestors 'none'; " .
+                  "base-uri 'self'; " .
+                  "report-uri /csp-report-endpoint/;";
+
+        $request->headers->set('Content-Security-Policy', $policy);
+
+        return $next($request);
     }
 }
