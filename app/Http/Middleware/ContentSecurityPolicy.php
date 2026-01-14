@@ -9,22 +9,11 @@ class ContentSecurityPolicy
 {
     public function handle(Request $request, Closure $next)
     {
-        $nonce = bin2hex(random_bytes(16));
-        $request->attributes->set('csp_nonce', $nonce);
+        $policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google-analytics.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://www.google-analytics.com; img-src 'self' data:; style-src 'self' 'unsafe-inline'; frame-src 'none'; object-src 'none'; media-src 'self'; manifest-src 'self'; form-action 'self'; frame-ancestors 'self'; base-uri 'self'; report-uri /csp-report";
 
-        $policy = "default-src 'self' 'strict-dynamic' https: http:; " .
-                  "script-src 'self' 'unsafe-inline' 'nonce-" . $nonce . "' https://fonts.googleapis.com; " .
-                  "connect-src 'self' http://127.0.0.1:8000 https://127.0.0.1:8000 https://127.0.0.1; " .
-                  "img-src 'self' data: https://fonts.gstatic.com; " .
-                  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " .
-                  "font-src 'self' https://fonts.gstatic.com; " .
-                  "form-action 'self'; " .
-                  "frame-ancestors 'none'; " .
-                  "base-uri 'self'; " .
-                  "report-uri /csp-report-endpoint/;";
-
-        $request->headers->set('Content-Security-Policy', $policy);
-
-        return $next($request);
+        $response = $next($request);
+        $response->header('Content-Security-Policy', $policy);
+        
+        return $response;
     }
 }
