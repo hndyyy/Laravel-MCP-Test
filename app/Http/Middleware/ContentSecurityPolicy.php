@@ -3,17 +3,16 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 
 class ContentSecurityPolicy
 {
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
-        $policy = "default-src 'self'; script-src 'self' https://www.google-analytics.com 'unsafe-inline'; connect-src 'self' https://www.google-analytics.com; font-src 'self' https://fonts.gstatic.com; style-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com 'unsafe-inline'; img-src 'self' https://fonts.gstatic.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; block-all-mixed-content; upgrade-insecure-requests";
+        $policy = "default-src 'self'; script-src 'self' 'unsafe-inline' www.google-analytics.com; font-src 'self' fonts.gstatic.com gstatic.com; style-src 'self' 'unsafe-inline' https:; connect-src 'self'; img-src 'self' data:;";
 
         $response = $next($request);
-
         $response->header('Content-Security-Policy', $policy);
-
         return $response;
     }
 }
