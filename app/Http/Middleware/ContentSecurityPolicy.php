@@ -9,16 +9,12 @@ class ContentSecurityPolicy
 {
     public function handle(Request $request, Closure $next)
     {
-        $policy = "default-src 'self'; script-src 'self' https://www.google-analytics.com 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' data:";
+        $response = $next($request);
 
-        $response = $next($request)->header('Content-Security-Policy', $policy);
+        $policy = "default-src 'self'; script-src 'self' 'nonce-' https://ssl.google-analytics.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src 'self' fonts.gstatic.com data:; connect-src 'self' analytics.google.com; img-src 'self' data:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://*.payment-gateway.com;";
 
-        if ($request->is('admin') || $request->is('admin/*')) {
-            $response->header('Content-Security-Policy', "${policy}; report-uri /admin/csp-report");
-        }
+        $response->headers->set('Content-Security-Policy', $policy);
 
         return $response;
     }
-
-    public function terminate(Request $request, $response) {}
 }
